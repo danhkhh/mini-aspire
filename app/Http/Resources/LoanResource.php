@@ -15,6 +15,7 @@ class LoanResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
+            'id'     => $this->id,
             'amount' => $this->amount,
             'term'   => $this->term,
         ];

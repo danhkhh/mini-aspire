@@ -18,6 +18,7 @@ class RolesPermissionsSeeder extends Seeder
         'loan.delete',
         'loan.view',
         'loan.list',
+        'loan.updateStatus',
 
         'repayment.create',
         'repayment.update',
@@ -36,6 +37,7 @@ class RolesPermissionsSeeder extends Seeder
         'loan.delete',
         'loan.view',
         'loan.list',
+        'loan.updateStatus',
 
         'repayment.create',
         'repayment.update',

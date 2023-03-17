@@ -15,7 +15,7 @@ class UsersSeeder extends Seeder
     {
         $users = [
             [
-                'role'              => config('.ADMIN'),
+                'role'              => config('roles.ADMIN'),
                 'name'              => 'admin',
                 'email'             => 'admin@test.com',
                 'password'          => bcrypt('111111'),

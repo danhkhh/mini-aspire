@@ -18,7 +18,7 @@ abstract class TestCase extends BaseTestCase
      */
     protected function signInById(int $id): User
     {
-        $user = User::find($id);
+        $user = User::findOrFail($id);
         $this->actingAs($user);
 
         return $user;

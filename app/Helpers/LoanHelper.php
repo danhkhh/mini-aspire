@@ -7,11 +7,11 @@ namespace App\Helpers;
  *
  * @package App\Helpers
  */
-class LoanHelper {
-
+class LoanHelper
+{
     /**
-     * @param int $amount
-     * @param int $term
+     * @param  int  $amount
+     * @param  int  $term
      * @return array
      */
     public static function getRepaymentAmounts(int $amount, int $term): array

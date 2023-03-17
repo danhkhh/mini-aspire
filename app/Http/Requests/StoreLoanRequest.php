@@ -23,11 +23,13 @@ class StoreLoanRequest extends FormRequest
     {
         return [
             'amount' => [
+                'required',
                 'integer',
                 'min:'.config('loan.loan_min_amount'),
                 'max:'.config('loan.loan_max_amount'),
             ],
             'term' => [
+                'required',
                 'integer',
                 'min:'.config('loan.loan_min_term'),
                 'max:'.config('loan.loan_max_term'),

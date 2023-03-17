@@ -16,7 +16,7 @@ trait CreatesApplication
         $app = require __DIR__.'/../bootstrap/app.php';
 
         $app->make(Kernel::class)->bootstrap();
-        Artisan::call('migrate:fresh --seed');
+        Artisan::call('migrate:refresh --seed');
 
         return $app;
     }

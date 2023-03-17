@@ -3,7 +3,6 @@
 namespace Tests\Feature\Loan;
 
 use App\Models\Loan;
-use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Response;
 use Tests\TestCase;
@@ -31,8 +30,8 @@ class LoanFeatureTest extends TestCase
     }
 
     /**
-     *
      * @dataProvider getValidParams
+     *
      * @group loan
      */
     public function test_unauthenticated_users_can_not_create_loan(array $params): void
@@ -43,8 +42,8 @@ class LoanFeatureTest extends TestCase
     }
 
     /**
-     *
      * @dataProvider getInvalidParams
+     *
      * @group loan
      */
     public function test_customer_can_not_create_loan_with_invalid_params(array $params): void
@@ -56,8 +55,8 @@ class LoanFeatureTest extends TestCase
     }
 
     /**
-     *
      * @dataProvider getValidParams
+     *
      * @group loan
      */
     public function test_customer_can_create_loan_with_valid_params(array $params): void
@@ -67,13 +66,75 @@ class LoanFeatureTest extends TestCase
         $response->assertStatus(Response::HTTP_CREATED);
         // loan exists
         $this->assertDatabaseHas('loans', [
-           'user_id' => UserData::CUSTOMER_ID,
-           'amount' => $params['amount'],
-           'term' => $params['term'],
-           'status' => Loan::STATUS_PENDING,
+            'user_id' => UserData::CUSTOMER_ID,
+            'amount'  => $params['amount'],
+            'term'    => $params['term'],
+            'status'  => Loan::STATUS_PENDING,
         ]);
 
         // repayments exist
         $this->assertDatabaseCount('repayments', $params['term']);
+    }
+
+    /**
+     * @group loan
+     */
+    public function test_unauthenticated_user_can_not_update_loan_status(): void
+    {
+        $response = $this->postJson(route('loans.update_status', [1]), ['status' => Loan::STATUS_APPROVED]);
+        $response->assertStatus(Response::HTTP_UNAUTHORIZED);
+    }
+
+    /**
+     * @group loan
+     */
+    public function test_customer_can_not_update_loan_status(): void
+    {
+        $loan = $this->createPendingLoanAndRepayment();
+        $this->signInById(UserData::CUSTOMER_ID);
+        $response = $this->postJson(route('loans.update_status', [$loan->id]), ['status' => Loan::STATUS_APPROVED]);
+        $response->assertStatus(Response::HTTP_FORBIDDEN);
+    }
+
+    /**
+     * @group loan
+     */
+    public function test_admin_can_not_update_loan_status_with_invalid_id(): void
+    {
+        $this->signInById(UserData::ADMIN_ID);
+        $response = $this->postJson(route('loans.update_status', [-1]), ['status' => Loan::STATUS_APPROVED]);
+        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
+    }
+
+    /**
+     * @group loan
+     */
+    public function test_admin_can_not_update_loan_status_already_approved(): void
+    {
+        $loan = Loan::factory()->approved()->create(['user_id' => UserData::ADMIN_ID]);
+        $this->signInById(UserData::ADMIN_ID);
+        $response = $this->postJson(route('loans.update_status', [$loan->id]), ['status' => Loan::STATUS_APPROVED]);
+        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
+    }
+
+    /**
+     * @group loan
+     */
+    public function test_admin_can_update_pending_loan_to_approved(): void
+    {
+        $loan = $this->createPendingLoanAndRepayment();
+        $this->signInById(UserData::ADMIN_ID);
+        $response = $this->postJson(route('loans.update_status', [$loan->id]), ['status' => Loan::STATUS_APPROVED]);
+        $response->assertStatus(Response::HTTP_NO_CONTENT);
+    }
+
+    /**
+     * @return Loan
+     */
+    private function createPendingLoanAndRepayment(): Loan
+    {
+        $loan = Loan::factory()->pending()->create(['user_id' => UserData::ADMIN_ID]);
+        // @todo: repayments
+        return $loan;
     }
 }

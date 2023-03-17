@@ -5,14 +5,12 @@ namespace App\Observers;
 use App\Helpers\LoanHelper;
 use App\Models\Loan;
 use App\Models\Repayment;
-use App\Services\Loan\LoanServiceInterface;
 use Carbon\Carbon;
 
 class LoanObserver
 {
     /**
-     *
-     * @param Loan $loan
+     * @param  Loan  $loan
      */
     public function created(Loan $loan): void
     {
