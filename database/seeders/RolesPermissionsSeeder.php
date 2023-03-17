@@ -17,13 +17,13 @@ class RolesPermissionsSeeder extends Seeder
         'loan.update',
         'loan.delete',
         'loan.view',
-        'list loan',
+        'loan.list',
 
         'repayment.create',
         'repayment.update',
         'repayment.delete',
         'repayment.view',
-        'list repayment',
+        'repayment.list',
         'makePayment',
     ];
 
@@ -35,13 +35,13 @@ class RolesPermissionsSeeder extends Seeder
         'loan.update',
         'loan.delete',
         'loan.view',
-        'list loan',
+        'loan.list',
 
         'repayment.create',
         'repayment.update',
         'repayment.delete',
         'repayment.view',
-        'list repayment',
+        'repayment.list',
         'makePayment',
     ];
 
@@ -51,10 +51,10 @@ class RolesPermissionsSeeder extends Seeder
     const CUSTOMER_PERMISSIONS = [
         'loan.create',
         'loan.view',
-        'list loan',
+        'loan.list',
         'repayment.create',
         'repayment.view',
-        'list repayment',
+        'repayment.list',
         'makePayment',
     ];
 
