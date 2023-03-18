@@ -1,0 +1,358 @@
+{
+	"info": {
+		"_postman_id": "3e17f282-c539-4744-b43e-50f147e81ee6",
+		"name": "mini-aspire",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "11167373"
+	},
+	"item": [
+		{
+			"name": "Login",
+			"item": [
+				{
+					"name": "Customer Login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "X-XSRF-TOKEN",
+								"value": "{{xsrf-cookie}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "localhost/login?email=customer@test.com&password=111111",
+							"host": [
+								"localhost"
+							],
+							"path": [
+								"login"
+							],
+							"query": [
+								{
+									"key": "email",
+									"value": "customer@test.com"
+								},
+								{
+									"key": "password",
+									"value": "111111"
+								},
+								{
+									"key": "",
+									"value": "",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "X-XSRF-TOKEN",
+								"value": "{{xsrf-cookie}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "localhost/logout",
+							"host": [
+								"localhost"
+							],
+							"path": [
+								"logout"
+							],
+							"query": [
+								{
+									"key": "",
+									"value": "",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Admin Login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "X-XSRF-TOKEN",
+								"value": "{{xsrf-cookie}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "localhost/login?email=admin@test.com&password=111111",
+							"host": [
+								"localhost"
+							],
+							"path": [
+								"login"
+							],
+							"query": [
+								{
+									"key": "email",
+									"value": "admin@test.com"
+								},
+								{
+									"key": "password",
+									"value": "111111"
+								},
+								{
+									"key": "",
+									"value": "",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Customer Creates Loan",
+			"item": [
+				{
+					"name": "Customer Creates Loan",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var loan = pm.response.json();\r",
+									"pm.environment.set('loan_id', loan.data.id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Referer",
+								"value": "{{host}}",
+								"type": "text"
+							},
+							{
+								"key": "X-XSRF-TOKEN",
+								"value": "{{xsrf-cookie}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "localhost/api/loans?amount=1000&term=3",
+							"host": [
+								"localhost"
+							],
+							"path": [
+								"api",
+								"loans"
+							],
+							"query": [
+								{
+									"key": "amount",
+									"value": "1000"
+								},
+								{
+									"key": "term",
+									"value": "3"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Customer Views Loan",
+			"item": [
+				{
+					"name": "Customer Views Loan",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Referer",
+								"value": "{{host}}",
+								"type": "text"
+							},
+							{
+								"key": "X-XSRF-TOKEN",
+								"value": "{{xsrf-cookie}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "localhost/api/loans/1",
+							"host": [
+								"localhost"
+							],
+							"path": [
+								"api",
+								"loans",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Admin Approves Loan",
+			"item": [
+				{
+					"name": "Admin Approves Loan",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Referer",
+								"value": "{{host}}",
+								"type": "text"
+							},
+							{
+								"key": "X-XSRF-TOKEN",
+								"value": "{{xsrf-cookie}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "localhost/api/loans/{{loan_id}}/update-status?status=APPROVED",
+							"host": [
+								"localhost"
+							],
+							"path": [
+								"api",
+								"loans",
+								"{{loan_id}}",
+								"update-status"
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "APPROVED"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Customer Makes Payment",
+			"item": [
+				{
+					"name": "Customer Makes Payment",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Referer",
+								"value": "{{host}}",
+								"type": "text"
+							},
+							{
+								"key": "X-XSRF-TOKEN",
+								"value": "{{xsrf-cookie}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "localhost/api/loans/{{loan_id}}/make-payment?amount=333.33",
+							"host": [
+								"localhost"
+							],
+							"path": [
+								"api",
+								"loans",
+								"{{loan_id}}",
+								"make-payment"
+							],
+							"query": [
+								{
+									"key": "amount",
+									"value": "333.33"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"pm.sendRequest({",
+					"    url: 'http://localhost/sanctum/csrf-cookie',",
+					"    method: 'GET'",
+					"}, function(error, response, { cookies }) {",
+					"    if (!error) {",
+					"        pm.environment.set('xsrf-cookie', cookies.get('XSRF-TOKEN'));",
+					"    }",
+					"});"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
