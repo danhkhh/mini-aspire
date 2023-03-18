@@ -18,6 +18,10 @@ class LoanResource extends JsonResource
             'id'     => $this->id,
             'amount' => $this->amount,
             'term'   => $this->term,
+            'status' => $this->status,
+
+            // avoid N+1 query issues
+            'repayments' => RepaymentResource::collection($this->whenLoaded('repayments')),
         ];
     }
 }

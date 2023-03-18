@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreLoanRequest;
 use App\Http\Requests\UpdateStatusLoanRequest;
 use App\Http\Resources\LoanResource;
+use App\Models\Loan;
 use App\Services\Loan\LoanServiceInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
@@ -23,8 +24,7 @@ class LoanController extends Controller
 
     /**
      * Store a newly created resource in storage.
-     */
-    /**
+     *
      * @param  StoreLoanRequest  $request
      * @return JsonResponse
      */
@@ -37,6 +37,18 @@ class LoanController extends Controller
         } catch (\Exception $e) {
             return $this->response->setStatusCode(Response::HTTP_BAD_REQUEST)->respond($e->getMessage());
         }
+    }
+
+    /**
+     * View a loan.
+     *
+     * @return JsonResponse
+     */
+    public function view(Loan $loan): JsonResponse
+    {
+        $loan->load('repayments');
+
+        return $this->response->respond(new LoanResource($loan));
     }
 
     /**

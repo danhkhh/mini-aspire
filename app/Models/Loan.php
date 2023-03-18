@@ -11,9 +11,11 @@ class Loan extends Model
 {
     use HasFactory;
 
-    CONST STATUS_PENDING = 'PENDING';
-    CONST STATUS_APPROVED = 'APPROVED';
-    CONST STATUS_PAID = 'PAID';
+    const STATUS_PENDING = 'PENDING';
+
+    const STATUS_APPROVED = 'APPROVED';
+
+    const STATUS_PAID = 'PAID';
 
     /**
      * The attributes that are mass assignable.
@@ -35,7 +37,6 @@ class Loan extends Model
     }
 
     /**
-     *
      * @return HasMany
      */
     public function repayments(): HasMany

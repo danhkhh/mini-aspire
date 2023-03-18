@@ -24,6 +24,10 @@ Route::middleware(['auth:sanctum'])->group(static function () {
         ->post('loans', [LoanController::class, 'store'])
         ->name('loans.store');
 
+    Route::middleware(['can:loan.view', 'can:update,loan'])
+        ->get('loans/{loan}', [LoanController::class, 'view'])
+        ->name('loans.view');
+
     Route::middleware('can:loan.updateStatus')
         ->post('loans/{id}/update-status', [LoanController::class, 'updateStatus'])
         ->name('loans.update_status');

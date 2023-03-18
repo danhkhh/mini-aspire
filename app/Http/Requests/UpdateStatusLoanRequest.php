@@ -33,7 +33,7 @@ class UpdateStatusLoanRequest extends FormRequest
             ],
             'status' => [
                 'required',
-                Rule::in([Loan::STATUS_APPROVED]), // in the future, there can be DECLINED as well
+                Rule::in([Loan::STATUS_APPROVED]), // in the future, there is probably DECLINED as well
             ],
         ];
     }

@@ -129,11 +129,54 @@ class LoanFeatureTest extends TestCase
     }
 
     /**
+     * @group loan
+     */
+    public function test_admin_can_view_loan(): void
+    {
+        $loan = $this->createPendingLoanAndRepayment();
+        $this->signInById(UserData::ADMIN_ID);
+        $response = $this->getJson(route('loans.view', ['loan' => $loan]));
+        $response->assertStatus(Response::HTTP_OK);
+    }
+
+    /**
+     * @group loan
+     */
+    public function test_unauthenticated_user_can_not_view_loan(): void
+    {
+        $loan     = $this->createPendingLoanAndRepayment();
+        $response = $this->getJson(route('loans.view', ['loan' => $loan]));
+        $response->assertStatus(Response::HTTP_UNAUTHORIZED);
+    }
+
+    /**
+     * @group loan
+     */
+    public function test_customer_can_not_view_other_loan(): void
+    {
+        $loan = $this->createPendingLoanAndRepayment();
+        $this->signInById(UserData::CUSTOMER2_ID);
+        $response = $this->getJson(route('loans.view', ['loan' => $loan]));
+        $response->assertStatus(Response::HTTP_FORBIDDEN);
+    }
+
+    /**
+     * @group loan
+     */
+    public function test_customer_can_view_own_loan(): void
+    {
+        $loan = $this->createPendingLoanAndRepayment();
+        $this->signInById(UserData::CUSTOMER_ID);
+        $response = $this->getJson(route('loans.view', ['loan' => $loan]));
+        $response->assertStatus(Response::HTTP_OK);
+    }
+
+    /**
      * @return Loan
      */
     private function createPendingLoanAndRepayment(): Loan
     {
-        $loan = Loan::factory()->pending()->create(['user_id' => UserData::ADMIN_ID]);
+        $loan = Loan::factory()->pending()->create(['user_id' => UserData::CUSTOMER_ID]);
         // @todo: repayments
         return $loan;
     }

@@ -28,6 +28,13 @@ class UsersSeeder extends Seeder
                 'password'          => bcrypt('111111'),
                 'email_verified_at' => Carbon::now(),
             ],
+            [
+                'role'              => config('roles.CUSTOMER'),
+                'name'              => 'customer2',
+                'email'             => 'customer2@test.com',
+                'password'          => bcrypt('111111'),
+                'email_verified_at' => Carbon::now(),
+            ],
         ];
 
         foreach ($users as $user) {
