@@ -4,7 +4,9 @@ namespace App\Services\Loan;
 
 use App\Exceptions\LoanStoreFailException;
 use App\Exceptions\LoanUpdateFailException;
+use App\Exceptions\MakePaymentFailException;
 use App\Models\Loan;
+use App\Models\Repayment;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -57,5 +59,27 @@ class AspireLoanService implements LoanServiceInterface
         DB::commit();
 
         return $loan;
+    }
+
+    /**
+     * @param  Repayment  $repayment
+     * @return Repayment
+     *
+     * @throws MakePaymentFailException
+     */
+    public function makePayment(Repayment $repayment): Repayment
+    {
+        try {
+            DB::beginTransaction();
+            $repayment->update(['status' => Loan::STATUS_PAID]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            report($e);
+
+            throw new MakePaymentFailException;
+        }
+        DB::commit();
+
+        return $repayment;
     }
 }

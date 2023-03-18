@@ -90,7 +90,7 @@ class LoanFeatureTest extends TestCase
      */
     public function test_customer_can_not_update_loan_status(): void
     {
-        $loan = $this->createPendingLoanAndRepayment();
+        $loan = $this->createPendingLoan();
         $this->signInById(UserData::CUSTOMER_ID);
         $response = $this->postJson(route('loans.update_status', [$loan->id]), ['status' => Loan::STATUS_APPROVED]);
         $response->assertStatus(Response::HTTP_FORBIDDEN);
@@ -122,7 +122,7 @@ class LoanFeatureTest extends TestCase
      */
     public function test_admin_can_update_pending_loan_to_approved(): void
     {
-        $loan = $this->createPendingLoanAndRepayment();
+        $loan = $this->createPendingLoan();
         $this->signInById(UserData::ADMIN_ID);
         $response = $this->postJson(route('loans.update_status', [$loan->id]), ['status' => Loan::STATUS_APPROVED]);
         $response->assertStatus(Response::HTTP_NO_CONTENT);
@@ -133,7 +133,7 @@ class LoanFeatureTest extends TestCase
      */
     public function test_admin_can_view_loan(): void
     {
-        $loan = $this->createPendingLoanAndRepayment();
+        $loan = $this->createPendingLoan();
         $this->signInById(UserData::ADMIN_ID);
         $response = $this->getJson(route('loans.view', ['loan' => $loan]));
         $response->assertStatus(Response::HTTP_OK);
@@ -144,7 +144,7 @@ class LoanFeatureTest extends TestCase
      */
     public function test_unauthenticated_user_can_not_view_loan(): void
     {
-        $loan     = $this->createPendingLoanAndRepayment();
+        $loan     = $this->createPendingLoan();
         $response = $this->getJson(route('loans.view', ['loan' => $loan]));
         $response->assertStatus(Response::HTTP_UNAUTHORIZED);
     }
@@ -154,7 +154,7 @@ class LoanFeatureTest extends TestCase
      */
     public function test_customer_can_not_view_other_loan(): void
     {
-        $loan = $this->createPendingLoanAndRepayment();
+        $loan = $this->createPendingLoan();
         $this->signInById(UserData::CUSTOMER2_ID);
         $response = $this->getJson(route('loans.view', ['loan' => $loan]));
         $response->assertStatus(Response::HTTP_FORBIDDEN);
@@ -165,19 +165,103 @@ class LoanFeatureTest extends TestCase
      */
     public function test_customer_can_view_own_loan(): void
     {
-        $loan = $this->createPendingLoanAndRepayment();
+        $loan = $this->createPendingLoan();
         $this->signInById(UserData::CUSTOMER_ID);
         $response = $this->getJson(route('loans.view', ['loan' => $loan]));
         $response->assertStatus(Response::HTTP_OK);
     }
 
     /**
+     * @group loan
+     */
+    public function test_unauthenticated_user_can_not_make_payment(): void
+    {
+        $loan     = $this->createPendingLoan();
+        $response = $this->postJson(route('loans.make_payment', ['loan' => $loan]));
+        $response->assertStatus(Response::HTTP_UNAUTHORIZED);
+    }
+
+    /**
+     * @group loan
+     */
+    public function test_customer_can_not_make_payment_for_other_loan(): void
+    {
+        $loan = $this->createApprovedLoan();
+        $this->signInById(UserData::CUSTOMER2_ID);
+        $response = $this->postJson(route('loans.make_payment', ['loan' => $loan]));
+        $response->assertStatus(Response::HTTP_FORBIDDEN);
+    }
+
+    /**
+     * @group loan
+     */
+    public function test_customer_can_not_make_payment_for_pending_loan(): void
+    {
+        $loan = $this->createPendingLoan();
+        $this->signInById(UserData::CUSTOMER_ID);
+        $response = $this->postJson(route('loans.make_payment', ['loan' => $loan, 'amount' => 20]));
+        $response->assertStatus(Response::HTTP_FORBIDDEN);
+    }
+
+    /**
+     * @group loan
+     */
+    public function test_customer_can_make_payment_for_own_loan(): void
+    {
+        $this->signInById(UserData::CUSTOMER_ID);
+
+        // create loan
+        $params   = $this->getValidParams()[0][0];
+        $response = $this->postJson(route('loans.store'), $params);
+        $response->assertStatus(Response::HTTP_CREATED);
+
+        $data = json_decode($response->getContent());
+        $loan = Loan::findOrFail($data->data->id);
+        $loan->update(['status' => Loan::STATUS_APPROVED]);
+        $loan->repayments()->update(['status' => Loan::STATUS_APPROVED]);
+
+        // amount less than expected
+        $response = $this->postJson(route('loans.make_payment', ['loan' => $loan, 'amount' => 20]));
+        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
+
+        // payment 1
+        $response = $this->postJson(route('loans.make_payment', ['loan' => $loan, 'amount' => 33.5]));
+        $response->assertStatus(Response::HTTP_NO_CONTENT);
+
+        // payment 2
+        $response = $this->postJson(route('loans.make_payment', ['loan' => $loan, 'amount' => 33.5]));
+        $response->assertStatus(Response::HTTP_NO_CONTENT);
+
+        // payment 3
+        $response = $this->postJson(route('loans.make_payment', ['loan' => $loan, 'amount' => 33.5]));
+        $response->assertStatus(Response::HTTP_NO_CONTENT);
+
+        // Loan status becomes PAID
+        $loan->refresh();
+        $this->assertEquals(Loan::STATUS_PAID, $loan->status);
+
+        // payment 4: forbidden since loan status is PAID
+        $response = $this->postJson(route('loans.make_payment', ['loan' => $loan, 'amount' => 33.5]));
+        $response->assertStatus(Response::HTTP_FORBIDDEN);
+    }
+
+    /**
      * @return Loan
      */
-    private function createPendingLoanAndRepayment(): Loan
+    private function createPendingLoan(): Loan
     {
         $loan = Loan::factory()->pending()->create(['user_id' => UserData::CUSTOMER_ID]);
-        // @todo: repayments
+
+        return $loan;
+    }
+
+    /**
+     * @return Loan
+     */
+    private function createApprovedLoan(): Loan
+    {
+        $loan = Loan::factory()->approved()->create(['user_id' => UserData::CUSTOMER_ID]);
+
         return $loan;
     }
 }

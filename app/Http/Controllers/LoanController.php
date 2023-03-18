@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\MakeRepaymentRequest;
 use App\Http\Requests\StoreLoanRequest;
 use App\Http\Requests\UpdateStatusLoanRequest;
 use App\Http\Resources\LoanResource;
@@ -23,7 +24,7 @@ class LoanController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Customer create a new loan
      *
      * @param  StoreLoanRequest  $request
      * @return JsonResponse
@@ -40,7 +41,7 @@ class LoanController extends Controller
     }
 
     /**
-     * View a loan.
+     * Admin/Customer views a loan.
      *
      * @return JsonResponse
      */
@@ -52,6 +53,8 @@ class LoanController extends Controller
     }
 
     /**
+     * Admin approves the loan (Consider that Admin can decline loan in the future)
+     *
      * @param  int  $id
      * @param  UpdateStatusLoanRequest  $request
      * @return JsonResponse
@@ -60,6 +63,26 @@ class LoanController extends Controller
     {
         try {
             $this->loanService->update($id, $request->only('status'));
+
+            return $this->response
+                ->setStatusCode(Response::HTTP_NO_CONTENT)
+                ->respond(null);
+        } catch (\Exception $e) {
+            return $this->response->setStatusCode(Response::HTTP_BAD_REQUEST)->respond($e->getMessage());
+        }
+    }
+
+    /**
+     * Customer makes a repayment
+     *
+     * @param  MakeRepaymentRequest  $request
+     * @param  Loan  $loan
+     * @return JsonResponse
+     */
+    public function makePayment(MakeRepaymentRequest $request, Loan $loan): JsonResponse
+    {
+        try {
+            $this->loanService->makePayment($request->nextRepayment);
 
             return $this->response
                 ->setStatusCode(Response::HTTP_NO_CONTENT)

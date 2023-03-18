@@ -3,6 +3,7 @@
 namespace App\Services\Loan;
 
 use App\Models\Loan;
+use App\Models\Repayment;
 
 interface LoanServiceInterface
 {
@@ -22,4 +23,12 @@ interface LoanServiceInterface
      * @throws \Exception
      */
     public function update(int $id, array $data): Loan;
+
+    /**
+     * @param  Repayment  $repayment
+     * @return Repayment
+     *
+     * @throws \Exception
+     */
+    public function makePayment(Repayment $repayment): Repayment;
 }

@@ -19,6 +19,16 @@ class LoanData
             ],
         ];
         $this->invalidLoanParams = [
+            'missing_amount' => [
+                [
+                    'term'   => 3,
+                ],
+            ],
+            'missing_term' => [
+                [
+                    'amount' => 100,
+                ],
+            ],
             'amount_gt_max' => [
                 [
                     'amount' => 18446744073709551615 + 1,

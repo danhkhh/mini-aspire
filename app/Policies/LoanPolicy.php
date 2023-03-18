@@ -9,6 +9,10 @@ class LoanPolicy
 {
     /**
      * Perform pre-authorization checks.
+     *
+     * @param  User  $user
+     * @param  string  $ability
+     * @return bool|null
      */
     public function before(User $user, string $ability): bool|null
     {
@@ -21,8 +25,12 @@ class LoanPolicy
 
     /**
      * Determine if the given loan can be viewed by the user.
+     *
+     * @param  User|null  $user
+     * @param  Loan  $loan
+     * @return bool
      */
-    public function update(?User $user, Loan $loan): bool
+    public function view(?User $user, Loan $loan): bool
     {
         return $user?->id === $loan->user_id;
     }

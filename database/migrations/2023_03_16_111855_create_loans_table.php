@@ -15,7 +15,11 @@ return new class extends Migration
     {
         Schema::create('loans', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(User::class);
+            $table->foreignIdFor(User::class)
+                ->nullable()
+                ->constrained()
+                ->onUpdate('SET NULL')
+                ->onDelete('SET NULL');
             $table->unsignedBigInteger('amount');
             $table->unsignedSmallInteger('term');
             $table->enum('status', config('loan.statuses'))->default(Loan::STATUS_PENDING);

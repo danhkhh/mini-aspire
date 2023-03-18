@@ -2,47 +2,22 @@
 
 namespace App\Observers;
 
+use App\Models\Loan;
 use App\Models\Repayment;
 
 class RepaymentObserver
 {
     /**
-     * Handle the Repayment "created" event.
-     */
-    public function created(Repayment $repayment): void
-    {
-        //
-    }
-
-    /**
      * Handle the Repayment "updated" event.
      */
     public function updated(Repayment $repayment): void
     {
-        //
-    }
-
-    /**
-     * Handle the Repayment "deleted" event.
-     */
-    public function deleted(Repayment $repayment): void
-    {
-        //
-    }
-
-    /**
-     * Handle the Repayment "restored" event.
-     */
-    public function restored(Repayment $repayment): void
-    {
-        //
-    }
-
-    /**
-     * Handle the Repayment "force deleted" event.
-     */
-    public function forceDeleted(Repayment $repayment): void
-    {
-        //
+        if ($repayment->isDirty('status') && $repayment->status == Loan::STATUS_PAID) {
+            $loan = $repayment->loan;
+            if (! $loan->repayments()->where('status', '!=', Loan::STATUS_PAID)->count()) {
+                // all repayments are already paid, the loan become PAID
+                $loan->update(['status' => Loan::STATUS_PAID]);
+            }
+        }
     }
 }

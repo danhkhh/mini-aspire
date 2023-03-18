@@ -14,9 +14,13 @@ return new class extends Migration
     {
         Schema::create('repayments', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('loan_id');
+            $table->foreignIdFor(Loan::class)
+                ->nullable()
+                ->constrained()
+                ->onUpdate('SET NULL')
+                ->onDelete('SET NULL');
             $table->date('schedule_date');
-            $table->unsignedFloat('amount');
+            $table->unsignedFloat('amount', 22);
             $table->enum('status', config('loan.statuses'))->default(Loan::STATUS_PENDING);
             $table->timestamps();
         });
